@@ -1,3 +1,5 @@
+import string
+import random
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
@@ -29,5 +31,17 @@ class Bookmark(db.Model):
     created_at = db.column(db.DateTime, default=datetime.now())
     updated_at = db.column(db.DateTime, onupdate=datetime.now())
 
+    def __init__(self,**kwargs):
+        super.__init__(**kwargs)
+        self.short_url = self.generate_short_characters()
+    
     def __repr__(self):
-        return self.id
+        return self.url
+    
+    def generate_short_characters(self):
+        characters = string.digits + string.ascii_letters
+        picked_chars = ''.join(random.choice(characters,k=3))
+        link = self.query.filter_by(short_url=picked_chars).first()
+        if link:
+            self.generate_short_characters()
+        return picked_chars
