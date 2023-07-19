@@ -8,8 +8,8 @@ from src.database import User, db
 
 auth = Blueprint("auth",__name__,url_prefix="/api/v1/auth")
 
-@auth.get('/register')
-def me():
+@auth.post('/register')
+def register_new_user():
     username = request.json['username']
     email = request.json['email']
     password = request.json['password']
