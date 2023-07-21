@@ -1,10 +1,12 @@
 from os import access
-from src.constants.http_status_codes import *
-from flask import Blueprint, app, request, jsonify
-from werkzeug.security import generate_password_hash
-import validators
-from src.database import User, db
 
+import validators
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import create_access_token, create_refresh_token
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from src.constants.http_status_codes import *
+from src.database import User, db
 
 auth = Blueprint("auth",__name__,url_prefix="/api/v1/auth")
 
@@ -44,3 +46,30 @@ def register_new_user():
         }
 
     }), HTTP_201_CREATED
+
+
+@auth.post('/login')
+def login():
+    email = request.json.get('email', '')
+    password = request.json.get('password', '')
+
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        is_pass_correct = check_password_hash(user.password, password)
+
+        if is_pass_correct:
+            refresh = create_refresh_token(identity=user.id)
+            access = create_access_token(identity=user.id)
+
+            return jsonify({
+                'user': {
+                    'refresh': refresh,
+                    'access': access,
+                    'username': user.username,
+                    'email': user.email
+                }
+
+            }), HTTP_200_OK
+
+    return jsonify({'error': 'Wrong credentials'}), HTTP_401_UNAUTHORIZED
