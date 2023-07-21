@@ -2,7 +2,7 @@ from os import access
 
 import validators
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token,jwt_required,get_jwt_identity
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from src.constants.http_status_codes import *
@@ -73,3 +73,9 @@ def login():
             }), HTTP_200_OK
 
     return jsonify({'error': 'Wrong credentials'}), HTTP_401_UNAUTHORIZED
+
+
+@auth.get("/user")
+@jwt_required()
+def get_user():
+    user_id = get_jwt_identity()
