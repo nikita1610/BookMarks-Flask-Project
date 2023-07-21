@@ -52,9 +52,8 @@ def register_new_user():
 def login():
     email = request.json.get('email', '')
     password = request.json.get('password', '')
-
+    print(email,password)
     user = User.query.filter_by(email=email).first()
-
     if user:
         is_pass_correct = check_password_hash(user.password, password)
 
@@ -71,11 +70,18 @@ def login():
                 }
 
             }), HTTP_200_OK
+        else:
+            return jsonify({'error': 'Password Mismatch'}), HTTP_401_UNAUTHORIZED
 
-    return jsonify({'error': 'Wrong credentials'}), HTTP_401_UNAUTHORIZED
+    return jsonify({'error': 'User not found'}), HTTP_401_UNAUTHORIZED
 
 
 @auth.get("/user")
 @jwt_required()
 def get_user():
     user_id = get_jwt_identity()
+    user = User.query.filter_by(id=user_id).first()
+    return jsonify({
+        'username': user.username,
+        'email': user.email
+    }), HTTP_200_OK
