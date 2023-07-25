@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager
 from src.auth import auth
 from src.bookmarks import bookmarks
 from src.database import db
+from src.short_url import short_url
 
 
 def create_app(test_config=None):
@@ -28,5 +29,6 @@ def create_app(test_config=None):
 
     app.register_blueprint(auth)
     app.register_blueprint(bookmarks)
+    app.register_blueprint(short_url)
 
     return app
