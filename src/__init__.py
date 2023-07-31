@@ -1,5 +1,6 @@
 import os
 
+from flasgger import Swagger, swag_from
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 
@@ -8,7 +9,7 @@ from src.bookmarks import bookmarks
 from src.constants.http_status_codes import *
 from src.database import db
 from src.short_url import short_url
-
+from src.config.swagger import swagger_config,template
 
 def create_app(test_config=None):
     app = Flask(__name__,instance_relative_config=True)
@@ -18,7 +19,11 @@ def create_app(test_config=None):
             SECRET_KEY=os.environ.get("SECRET_KEY"),
             SQLALCHEMY_DATABASE_URI=os.environ.get("SQLALCHEMY_DATABASE_URI"),
             SQLALCHEMY_TRACK_MODIFICATIONS = False,
-            JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+            JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY'),
+            SWAGGER={
+                'title': "Bookmarks API",
+                'uiversion': 3
+            }
         )
     else:
         app.config.from_mapping(test_config)
@@ -31,6 +36,8 @@ def create_app(test_config=None):
     app.register_blueprint(auth)
     app.register_blueprint(bookmarks)
     app.register_blueprint(short_url)
+
+    Swagger(app, config=swagger_config, template=template)
 
 
     @app.errorhandler(HTTP_404_NOT_FOUND)
