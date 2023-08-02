@@ -8,10 +8,12 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from src.constants.http_status_codes import *
 from src.database import User, db
+from flasgger import swag_from
 
 auth = Blueprint("auth",__name__,url_prefix="/api/v1/auth")
 
 @auth.post('/register')
+@swag_from('./docs/auth/register.yaml')
 def register_new_user():
     username = request.json['username']
     email = request.json['email']
@@ -50,6 +52,7 @@ def register_new_user():
 
 
 @auth.post('/login')
+@swag_from('./docs/auth/login.yaml')
 def login():
     email = request.json.get('email', '')
     password = request.json.get('password', '')
