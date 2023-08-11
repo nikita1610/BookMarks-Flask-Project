@@ -9,7 +9,6 @@ from flasgger import swag_from
 bookmarks = Blueprint("bookmarks",__name__,url_prefix="/api/v1/bookmarks")
 
 @bookmarks.route('/', methods=['POST'])
-@swag_from('./docs/bookmarks/stats.yaml')
 @jwt_required()
 def create_bookmarks():
     current_user = get_jwt_identity()
@@ -150,6 +149,7 @@ def editbookmark(id):
 
 
 @bookmarks.get("/stats")
+@swag_from('/src/docs/bookmarks/stats.yaml')
 @jwt_required()
 def get_stats():
     current_user = get_jwt_identity()
